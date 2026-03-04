@@ -1,4 +1,6 @@
-# PROJETO GERADOR DE HTML E CSS COM IA - GEN-AI-HMTLCSS
+# GEN-AI-HMTLCSS
+
+PROJETO GERADOR DE HTML E CSS COM IA - GEN-AI-HMTLCSS
 
 *Este projeto foi construido usando o básico de html e css, e também javascript atráves de uma api groq usada para gerar os codigos.*
 
