@@ -31,20 +31,21 @@ async function gerarCodigo() {
     botao.style.opacity = "0.6";
 
     try {
-        // CHAMADA PARA A EDGE FUNCTION
-        const response = await fetch("/gerar-codigo", {
-            method: "POST",
-            body: JSON.stringify({ prompt: textoUsuario }),
-        });
+    
+    const response = await fetch("/gerar-codigo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: textoUsuario }),
+    });
 
-        const dados = await response.json();
+    const dados = await response.json();
 
-        if (response.status === 429) {
-            dispararNotificacao(dados.error);
-            return;
-        }
+    // VALIDAÇÃO CRUCIAL AQUI:
+    if (!response.ok || !dados.choices) {
+        throw new Error(dados.error || "Erro na resposta da IA");
+    }
 
-        let resultado = dados.choices[0].message.content;
+    let resultado = dados.choices[0].message.content;
 
         let estiloBase = `
         <style>
