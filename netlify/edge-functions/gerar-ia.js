@@ -1,7 +1,5 @@
-import { Context } from "[https://edge.netlify.com](https://edge.netlify.com)";
-
 export default async (request, context) => {
-  const userIP = context.ip;
+  // Identificação via Cookies (Netlify Edge já fornece o gerenciador de cookies no context)
   const userCookie = context.cookies.get("marcos-dev-id") || "new-user";
   
   if (request.method !== "POST") {
@@ -12,7 +10,7 @@ export default async (request, context) => {
     const { prompt } = await request.json();
     const apiKey = Deno.env.get("GROQ_API_KEY");
 
-    const response = await fetch("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -20,12 +18,11 @@ export default async (request, context) => {
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        temperature: 0.2, // Baixamos a temperatura para a IA ser menos "criativa" com textos
+        temperature: 0.2, 
         messages: [
           { 
             role: "system", 
             content: "Você é um terminal de código puro. Responda APENAS com código HTML e CSS. PROIBIDO: Usar markdown, usar crases (```), escrever qualquer texto explicativo ou saudações. Se o usuário pedir uma animação, entregue o <style> com @keyframes e o HTML necessário. Sua resposta deve começar diretamente com <style> ou <div>." 
-          },
           { role: "user", content: prompt }
         ],
       }),
@@ -33,22 +30,21 @@ export default async (request, context) => {
 
     const data = await response.json();
 
-    if (response.status === 429) {
-      return new Response(JSON.stringify({ error: "Limite da API atingido" }), { status: 429 });
-    }
-
-    // Criamos a resposta para poder setar o cookie
+    // Criamos a resposta
     const res = new Response(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
 
+    // Seta o Cookie se for novo (usando a API nativa do Edge)
     if (userCookie === "new-user") {
       context.cookies.set({
         name: "marcos-dev-id",
         value: crypto.randomUUID(),
         path: "/",
         httpOnly: true,
+        secure: true,
+        sameSite: "Lax",
         maxAge: 3600 * 24 * 7,
       });
     }
@@ -56,7 +52,7 @@ export default async (request, context) => {
     return res;
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: "Erro interno" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Erro interno no servidor" }), { status: 500 });
   }
 };
 
