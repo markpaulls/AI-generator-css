@@ -31,21 +31,20 @@ async function gerarCodigo() {
     botao.style.opacity = "0.6";
 
     try {
-    
-    const response = await fetch("/gerar-codigo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: textoUsuario }),
-    });
+        // CHAMADA PARA A EDGE FUNCTION
+        const response = await fetch("/gerar-codigo", {
+            method: "POST",
+            body: JSON.stringify({ prompt: textoUsuario }),
+        });
 
-    const dados = await response.json();
+        const dados = await response.json();
 
-    // VALIDAÇÃO CRUCIAL AQUI:
-    if (!response.ok || !dados.choices) {
-        throw new Error(dados.error || "Erro na resposta da IA");
-    }
+        if (response.status === 429) {
+            dispararNotificacao(dados.error);
+            return;
+        }
 
-    let resultado = dados.choices[0].message.content;
+        let resultado = dados.choices[0].message.content;
 
         let estiloBase = `
         <style>
@@ -66,7 +65,7 @@ async function gerarCodigo() {
     }
 }
 
-// ... Manter suas funções copiarTexto(), Listeners de ContextMenu e Copy ...
+
 function copiarTexto() {
     const texto = blocoCodigo.innerText;
     if (texto.length > 0) {

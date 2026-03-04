@@ -1,26 +1,31 @@
+import { Context } from "[https://edge.netlify.com](https://edge.netlify.com)";
+
 export default async (request, context) => {
+  const userIP = context.ip;
+  const userCookie = context.cookies.get("marcos-dev-id") || "new-user";
+  
+  if (request.method !== "POST") {
+    return new Response("Método não permitido", { status: 405 });
+  }
+
   try {
-    const API_KEY = Deno.env.get("GROQ_API_KEY");
-    const API_URL = "https://api.groq.com/openai/v1/chat/completions";
-
-    // 1. Verificação da requisição
-    if (request.method !== "POST") {
-      return new Response("Método não permitido", { status: 405 });
-    }
-
     const { prompt } = await request.json();
+    const apiKey = Deno.env.get("GROQ_API_KEY");
 
-    // 2. Chamada para o Groq
-    const response = await fetch(API_URL, {
+    const response = await fetch("[https://api.groq.com/openai/v1/chat/completions](https://api.groq.com/openai/v1/chat/completions)", {
       method: "POST",
       headers: {
+        "Authorization": `Bearer ${apiKey}`,
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`,
       },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
+        temperature: 0.2, // Baixamos a temperatura para a IA ser menos "criativa" com textos
         messages: [
-          { role: "system", content: "Voce é um gerador de HTML e CSS puro." },
+          { 
+            role: "system", 
+            content: "Você é um terminal de código puro. Responda APENAS com código HTML e CSS. PROIBIDO: Usar markdown, usar crases (```), escrever qualquer texto explicativo ou saudações. Se o usuário pedir uma animação, entregue o <style> com @keyframes e o HTML necessário. Sua resposta deve começar diretamente com <style> ou <div>." 
+          },
           { role: "user", content: prompt }
         ],
       }),
@@ -28,19 +33,31 @@ export default async (request, context) => {
 
     const data = await response.json();
 
-    // 3. Retorno para o frontend
-    return new Response(JSON.stringify(data), {
+    if (response.status === 429) {
+      return new Response(JSON.stringify({ error: "Limite da API atingido" }), { status: 429 });
+    }
+
+    // Criamos a resposta para poder setar o cookie
+    const res = new Response(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
 
-  } catch (error) {
-    console.error("Erro na Edge Function:", error);
-    return new Response(JSON.stringify({ error: error.message }), { 
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    if (userCookie === "new-user") {
+      context.cookies.set({
+        name: "marcos-dev-id",
+        value: crypto.randomUUID(),
+        path: "/",
+        httpOnly: true,
+        maxAge: 3600 * 24 * 7,
+      });
+    }
+
+    return res;
+
+  } catch (err) {
+    return new Response(JSON.stringify({ error: "Erro interno" }), { status: 500 });
   }
 };
 
-export const config = { path: "/gerar-codigo" };
+export const config = { path: "/api/gerar" };
