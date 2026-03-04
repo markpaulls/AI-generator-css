@@ -1,3 +1,7 @@
+[build]
+  # Define que a pasta para o deploy é a raiz onde está o seu index.html
+  publish = "."
+
 [[edge_functions]]
   function = "gerar-ia"
   path = "/gerar-codigo"
