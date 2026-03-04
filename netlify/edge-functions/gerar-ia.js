@@ -1,5 +1,5 @@
 export default async (request, context) => {
-  // Identificação via Cookies (Netlify Edge já fornece o gerenciador de cookies no context)
+  
   const userCookie = context.cookies.get("marcos-dev-id") || "new-user";
   
   if (request.method !== "POST") {
@@ -22,7 +22,7 @@ export default async (request, context) => {
         messages: [
           { 
             role: "system", 
-            content: "Você é um terminal de código puro. Responda APENAS com código HTML e CSS. PROIBIDO: Usar markdown, usar crases (```), escrever qualquer texto explicativo ou saudações. Se o usuário pedir uma animação, entregue o <style> com @keyframes e o HTML necessário. Sua resposta deve começar diretamente com <style> ou <div>." 
+            content: "Você é um terminal de código puro. Responda APENAS com código HTML e CSS. PROIBIDO: Usar markdown, usar crases (```), escrever qualquer texto explicativo ou saudações. Se o usuário pedir uma animação, entregue o <style> com @keyframes e o HTML necessário. Sua resposta deve começar diretamente com <style> ou <div>." },
           { role: "user", content: prompt }
         ],
       }),
@@ -30,13 +30,12 @@ export default async (request, context) => {
 
     const data = await response.json();
 
-    // Criamos a resposta
     const res = new Response(JSON.stringify(data), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
 
-    // Seta o Cookie se for novo (usando a API nativa do Edge)
+   
     if (userCookie === "new-user") {
       context.cookies.set({
         name: "marcos-dev-id",
