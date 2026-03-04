@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevClub - Gerador por IA</title>
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <h1>CSS Gerador <span>com IA</span> ✂</h1>
+    <p>Descreva o que você imagina e veja a mágica acontecer.</p>
+
+    <textarea class="caixa-texto" rows="3" placeholder="Ex: Gerar um botão com borda arredondada"></textarea>
+    <button class="botao-gerar">Gerar Código 📐</button>
+
+    <div class="resultado">
+        <div class="card-resultado">
+            <h2 class="title">Código</h2>
+            <div class="container-editor">
+                <div class="topo-codigo">
+                    <span>HTML & CSS</span>
+                    <button class="btn-copy">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </button>
+                </div>
+                <p class="bloco-codigo" id="codigoTexto"></p>
+            </div>
+        </div>
+
+        <div class="card-resultado">
+            <h2 class='title'>Preview</h2>
+           
+            <iframe class="resultado-codigo"></iframe>
+        </div>
+    </div>
+
+    <p class="links">
+        <a class="site-link" href="https://marcoslaber.com.br">Todos os direitos reservados. © - Orgulhosamente By Marcos Laber | Developer </a>
+    </p>
+
+    <div id="toast" class="toast-notificacao"></div>
+
+    <script type="module" src="./script.js"></script>
+</body>
+</html>
