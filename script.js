@@ -32,7 +32,7 @@ async function gerarCodigo() {
 
     try {
         // CHAMADA PARA A EDGE FUNCTION
-        const response = await fetch("/gerar-codigo", {
+        const response = await fetch("/api/gerar", {
             method: "POST",
             body: JSON.stringify({ prompt: textoUsuario }),
         });
