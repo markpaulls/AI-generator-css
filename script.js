@@ -31,7 +31,7 @@ async function gerarCodigo() {
     botao.style.opacity = "0.6";
 
     try {
-        // CHAMADA PARA A EDGE FUNCTION
+       
         const response = await fetch("/api/gerar", {
             method: "POST",
             body: JSON.stringify({ prompt: textoUsuario }),
@@ -68,12 +68,42 @@ async function gerarCodigo() {
 
 function copiarTexto() {
     const texto = blocoCodigo.innerText;
+
+
     if (texto.length > 0) {
         navigator.clipboard.writeText(texto).then(() => {
             dispararNotificacao("Copiado para a área de transferência!");
         });
+    } else {
+        dispararNotificacao("Nenhum texto para copiar.");
     }
 }
+
+
+document.addEventListener('copy', (e) => {
+    // Verifica se o foco está fora das áreas permitidas
+    const areaPermitida = e.target.closest('.caixa-texto') ||
+        e.target.closest('.bloco-codigo') ||
+        e.target.closest('.resultado-codigo');
+
+    if (!areaPermitida) {
+        e.preventDefault();
+        dispararNotificacao("©M&L");
+    }
+});
+
+// Bloqueia o Menu de Contexto (Botão Direito) fora das áreas de código
+document.addEventListener('contextmenu', (e) => {
+    const areaPermitida = e.target.closest('.caixa-texto') ||
+        e.target.closest('.bloco-codigo') ||
+        e.target.closest('.resultado-codigo');
+
+    if (!areaPermitida) {
+        e.preventDefault();
+        dispararNotificacao("©M&L");
+    }
+});
+
 
 botao.addEventListener("click", gerarCodigo);
 btnCopy.addEventListener('click', copiarTexto);
